@@ -1,0 +1,16 @@
+DatabaseSession(1769597131)--Connection(1983747920)--EclipseLink, version:Eclipse Persistence Services - 2.4.0 (Build 20120608)
+DatabaseSession(1769597131)--Connection(1983747920)--connecting(DatabaseLogin(
+	platform => InformixPlatform
+	user name => "Dvorsky"
+	datasource URL => "jdbc:informix-sqli://vyvoj:1525/db_hracia:INFORMIXSERVER=ds0_vyvoj"
+))
+DatabaseSession(1769597131)--Connection(1983747920)--Connected: jdbc:informix-sqli://vyvoj:1525/db_hracia:INFORMIXSERVER=ds0_vyvoj
+	User: Dvorsky
+	Database: Informix Dynamic Server Version: 10.06.FC13E
+	Driver: IBM Informix JDBC Driver for IBM Informix Dynamic Server Version: 3.00.JC3
+DatabaseSession(1769597131)--Connection(1983747920)--SELECT t1.platnost_od, t1.platnost_do, t1.uzivdata_id, t1.uzivatel_id, t1.obmedzenie_id FROM kaorganizacia t4, kauzpumpa t3, kaaplikac t2, kauzidata t1, kauzivsys t0 WHERE ((((UPPER(t0.evid_kod) = 'TESTER') AND ((t2.aplikacia_k = 'skolenie') AND ((t1.platnost_od <= {d '2025-01-15'}) AND ((t1.platnost_do >= {d '2025-01-15'}) OR (t1.platnost_do IS NULL))))) AND (t4.kod = 'ZP')) AND ((t4.organizacia_id = t0.organizacia_id) AND ((t2.aplikacia_id = t3.aplikacia_id) AND ((t3.obmedzenie_id = t1.obmedzenie_id) AND (t0.uzivatel_id = t1.uzivatel_id)))))
+DatabaseSession(1769597131)--Connection(1983747920)--SELECT platnost_do, uzivatel_id, platnost_od, e_mail, alias, evid_kod, prava_externy, uzivatel_meno, wfl_id, organizacia_id, lokalizacia_id FROM kauzivsys WHERE (uzivatel_id = 1684)
+DatabaseSession(1769597131)--Connection(1983747920)--SELECT platnost_od, platnost_do, uz_rola_id, uzivatel_id, apl_rola_id, uzivdata_id FROM kauzimenu WHERE (uzivdata_id = 1001608)
+DatabaseSession(1769597131)--Connection(1983747920)--SELECT chod, apl_rola_n, apl_rola_id, aplikacia_id, organizacia_id FROM kaaplrole WHERE (apl_rola_id = 1001284)
+DatabaseSession(1769597131)--Connection(1983747920)--SELECT akcia_n, akcia_id, apl_rola_id FROM kaaplhidd WHERE (apl_rola_id = 1001284)
+DatabaseSession(1769597131)--Connection(1983747920)--SELECT md1_objednavka.id,md1_objednavka.cislo_obj,md1_objednavka.datum,md1_objednavka.stav,md1_obchodny_partner.nazov,md1_objednavka.suma,POVOBJ.cislo_obj,kauzivsys.uzivatel_meno FROM md1_objednavka  LEFT OUTER JOIN md1_obchodny_partner ON (md1_obchodny_partner.id=md1_objednavka.obch_par_id)  LEFT OUTER JOIN kauzivsys ON (kauzivsys.uzivatel_id=md1_objednavka.vystavil)  LEFT OUTER JOIN md1_objednavka POVOBJ ON (md1_objednavka.povodna_obj_id=POVOBJ.id) ORDER BY 2
