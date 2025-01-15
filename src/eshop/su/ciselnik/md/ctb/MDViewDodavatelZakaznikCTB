@@ -1,0 +1,346 @@
+package eshop.su.ciselnik.md.ctb;
+
+
+import java.awt.Color;
+import java.awt.Font;
+import java.util.List;
+import eshop.bo.ciselniky.TypObchodnehoPartnera;
+import eshop.su.ciselnik.md.MDDodavatel;
+import eshop.su.ciselnik.md.MDFilterDodavatel;
+import eshop.su.ciselnik.md.MDFilterZakaznik;
+import eshop.su.ciselnik.md.MDObchodnyPartner;
+import eshop.su.ciselnik.md.MDZakaznik;
+import eshop.su.ciselnik.uc.UCObchodnyPartner;
+import eshop.su.common.MDHelper;
+import eshop.su.common.view.ViewObchodnyPartner;
+import netball.server.component.ListItem;
+import netball.server.component.XClientServerTable;
+import netball.server.component.XComboBox;
+import netball.server.component.XComponent;
+import netball.server.component.XFont;
+import netball.server.component.XFormattedTextField;
+import netball.server.component.XIcon;
+import netball.server.component.XMenu;
+import netball.server.component.XToolBarPopupMenuButton;
+import netball.server.component.renderer.FormattedTextRenderer;
+import netball.server.component.table.ValueTableRowColorModel;
+import netball.server.event.ClientActionEvent;
+import netball.server.event.ServerActionEvent;
+import netball.server.event.ServerEvent;
+import netball.server.event.ServerFocusEvent;
+import netball.server.event.ServerKeyEvent;
+import netball.server.event.ServerMouseEvent;
+import netball.server.pack.EnabledPack;
+import netball.server.pack.ServerPack;
+import netframework.access.AccessAction;
+import netframework.access.AccessControlObject;
+import netframework.eclipselink.EclipseLinkSession;
+import netframework.mediator.BasicMediator;
+import netframework.mediator.MDUtilities;
+import netframework.mediator.MediatorCallBackObject;
+import netframework.mediator.ViewTableDataSource;
+import netframework.mediator.ctb.MDViewClientServerTableCTB;
+import netframework.mediator.resource.MediatorResourceBuilder;
+
+public class MDViewDodavatelZakaznikCTB extends MDViewClientServerTableCTB {
+	
+	private final String INSERT_ACTION = createId(eshop.su.common.MDHelper.INSERT_BUTTON.getId());
+    //private final String OPRAVA_ACTION = createId(MediatorResourceBuilder.CORRECT_BUTTON);
+    //private final String VYMAZ_ACTION = createId(MediatorResourceBuilder.DELETE_BUTTON);
+    private final String TLAC_ACTION = createId(MediatorResourceBuilder.PRINT_BUTTON);
+    private final String VYBER_ACTION = createId(MediatorResourceBuilder.READ_BUTTON);
+    private final String FILTER_TYP_ACTION = createId(eshop.su.common.MDHelper.TYP_BUTTON.getId());
+    private final String FARBA_ACTION = createId(eshop.su.common.MDHelper.FARBA_BUTTON.getId());
+    
+    private TypObchodnehoPartneraActions typObchodnehoPartneraActions = new TypObchodnehoPartneraActions();
+        
+	@Override
+	public AccessAction[] getAccessActions() {
+		return new AccessAction[] {
+				   new AccessAction(INSERT_ACTION, eshop.su.common.MDHelper.INSERT_BUTTON.getText(), eshop.su.common.MDHelper.INSERT_BUTTON.getDescription(), typObchodnehoPartneraActions),
+	               //getAccessAction(OPRAVA_ACTION, MediatorResourceBuilder.CORRECT_BUTTON),
+	               //getAccessAction(VYMAZ_ACTION, MediatorResourceBuilder.DELETE_BUTTON),
+	               new AccessAction(FILTER_TYP_ACTION, eshop.su.common.MDHelper.TYP_BUTTON.getText(), eshop.su.common.MDHelper.TYP_BUTTON.getDescription(), typObchodnehoPartneraActions),	               
+	               new AccessAction(FARBA_ACTION, eshop.su.common.MDHelper.FARBA_BUTTON.getText(), eshop.su.common.MDHelper.FARBA_BUTTON.getDescription())
+	         };
+	}
+	
+	private AccessAction getAccessAction(String actionCode, String buttonCode) {
+    	return MediatorResourceBuilder.createAccessAction(actionCode, buttonCode, getLocale());
+    }
+	
+	@Override
+	protected ViewTableDataSource createDataSource() {
+		
+		String[] columns = new String[] {ViewObchodnyPartner.ID,
+				ViewObchodnyPartner.KOD,
+				ViewObchodnyPartner.NAZOV,
+				ViewObchodnyPartner.TYP,
+				ViewObchodnyPartner.ICO,
+		};
+		
+		return new ViewTableDataSource(new ViewObchodnyPartner(), columns, ViewObchodnyPartner.ID, ViewObchodnyPartner.NAZOV);		
+	}
+
+	@Override
+    protected boolean getInstallFilterHeader() {
+    	return true;
+    }
+	
+	@Override
+	protected String getTitleText() {
+		return "Obchodni Partneri";
+	}
+	
+	@Override
+	protected boolean installAddButton() {
+		return false;
+	}
+	
+	//musi byt @Override ale realne nepouzivam
+	@Override
+	protected void insert(ServerPack pack) throws Exception {
+		//createPridajButton();
+		//runNext(MDObchodnyPartner.class, null, pack);		
+		
+	}
+	
+	@Override
+	protected void update(ServerPack pack, Object id) throws Exception {
+		
+		//je tu metoda na ziskane indexu riadku a z neho potom uz vytahujem data z konkretneho stlpca
+		int index = this.getSelectedIndex();
+		Object typ = this.getData().getRow(index).getValueAt(this.getData().getColumnIndex(ViewObchodnyPartner.TYP));
+				
+		if (typ.equals(TypObchodnehoPartnera.ZAKAZNIK.getKey())) runNext(MDZakaznik.class, new MDObchodnyPartner.Parameters(id), pack);
+		if (typ.equals(TypObchodnehoPartnera.DODAVATEL.getKey())) runNext(MDDodavatel.class, new MDObchodnyPartner.Parameters(id), pack);		
+	}
+	
+	@Override
+	protected void delete(Object id) throws Exception {
+		UCObchodnyPartner.delete(id, (EclipseLinkSession) this.getSessionObject());	
+	}
+
+	@Override
+	protected void addButtonsToToolBar(List<XComponent> components) {
+    	ServerActionEvent event = new ServerActionEvent(getId());
+        event.addReturnValue(TABLE);
+        event.addReturnProperty(FILTER_TYP_ACTION);
+        components.add(createTypButton());
+/*		components.stream()
+			.forEach(System.out::println);*/
+        
+        event = new ServerActionEvent(getId());
+        //event.addReturnValue(TABLE);
+        components.add(createPridajButton());
+        event.addReturnProperty(INSERT_ACTION);
+        
+        event = new ServerActionEvent(getId());
+        event.addReturnValue(TABLE);
+        components.add(createFarbaButton());
+        event.addReturnProperty(FARBA_ACTION);        
+    }
+
+	private XToolBarPopupMenuButton createTypButton() {
+		XToolBarPopupMenuButton button = MDUtilities.createToolBarPopupMenuButton(FILTER_TYP_ACTION, MDHelper.TYP_BUTTON, null, getSessionObject());
+		XIcon icon = new XIcon(MDUtilities.FILTER_ICON);
+		button.setIcon(icon);
+
+        XMenu menuItem = new XMenu(typObchodnehoPartneraActions.ZAKAZNIK_ACTION, translateText(TypObchodnehoPartnera.ZAKAZNIK.getText()));
+        ServerActionEvent event = new ServerActionEvent(getId());
+        event.addReturnValue(TABLE);
+        //event.addAlert(new YesNoAlert(translateText(MDHelper.MESSAGE_ZAKAZNIK)));  
+        menuItem.addActionEvent(event);
+        button.addMenuItem(menuItem);
+    	
+		menuItem = new XMenu(typObchodnehoPartneraActions.DODAVATEL_ACTION, translateText(TypObchodnehoPartnera.DODAVATEL.getText()));
+		event = new ServerActionEvent(getId());
+		event.addReturnValue(TABLE);
+		//event.addAlert(new YesNoAlert(translateText(MDHelper.MESSAGE_DODAVATEL)));
+		menuItem.addActionEvent(event);
+		button.addMenuItem(menuItem);
+    	
+		return button;
+    }
+	
+	private XToolBarPopupMenuButton createPridajButton() {
+		XToolBarPopupMenuButton button = MDUtilities.createToolBarPopupMenuButton(INSERT_ACTION, MDHelper.INSERT_BUTTON, null, getSessionObject());
+		XIcon icon = new XIcon(MDUtilities.ADD_ICON);
+		button.setIcon(icon);
+		
+    	button.setDescription(eshop.su.common.MDHelper.INSERT_BUTTON.getDescription());
+    	
+        XMenu menuItem = new XMenu(typObchodnehoPartneraActions.ZAKAZNIK_ACTION, TypObchodnehoPartnera.ZAKAZNIK.getText());
+        ServerActionEvent event = new ServerActionEvent(getId());
+        //event.addReturnValue(TABLE);
+        //toto tu je sposob, ako zo ServerEventu prenesiem properties to ClientEventu a tym padom viem rozlisit tlacidla, aj ked filter mam rovnaky na oboch
+        event.addReturnProperty("pridaj");
+        event.setReturnAllProperties(true);
+        //System.out.println("typObchodnehoPartneraPridajActions.ZAKAZNIK_ACTION " + typObchodnehoPartneraPridajActions.ZAKAZNIK_ACTION);
+        menuItem.addActionEvent(event);
+        button.addMenuItem(menuItem);
+    	
+        menuItem = new XMenu(typObchodnehoPartneraActions.DODAVATEL_ACTION, TypObchodnehoPartnera.DODAVATEL.getText());
+        event = new ServerActionEvent(getId());
+        event.addReturnProperty("pridaj");
+        event.setReturnAllProperties(true);
+        //System.out.println("typObchodnehoPartneraPridajActions.DODAVATEL_ACTION " + typObchodnehoPartneraPridajActions.DODAVATEL_ACTION);
+        //event.addReturnValue(TABLE);
+        menuItem.addActionEvent(event);
+        button.addMenuItem(menuItem);
+        
+        return button;
+    }
+	
+	private XComboBox createFarbaButton() {
+		XComboBox comboBox =  new XComboBox(FARBA_ACTION);  //MDUtilities.create  .createToolBarPopupMenuButton(INSERT_ACTION, MDHelper.INSERT_BUTTON, null, getSessionObject());
+////	XIcon icon = new XIcon(MDUtilities.ADD_ICON);
+////	button.setIcon(icon);
+		
+		comboBox.setDescription(eshop.su.common.MDHelper.FARBA_BUTTON.getDescription());
+    	
+		comboBox.setVisibleCharCount(10);
+		//comboBox.setBackground(Color.yellow);
+		//comboBox.setForeground(Color.blue);
+		comboBox.setFont(new XFont("Courier", Font.BOLD, 12));
+		//comboBox.addItem(new ListItem(null, ""));
+		comboBox.addItem(new ListItem(1, "gray"));
+		comboBox.addItem(new ListItem(2, "red"));
+		comboBox.addItem(new ListItem(3, "blue"));
+		comboBox.addItem(new ListItem(4, "black"));
+		comboBox.setEditable(true);
+		comboBox.setSearchable(true);
+		//comboBox.setSelectedIndex(1);
+		comboBox.setValue("black");
+		/*XFormattedTextField field = new XFormattedTextField("??-???");
+       	comboBox.setEditor(field);
+       	comboBox.setRenderer(new FormattedTextRenderer("??-???"));*/
+		comboBox.setSelectedValueMustBeInList(true);
+		
+		//comboBox.getSelectedIndex();
+		System.out.println("comboBox.getSelectedIndex() " + comboBox.getSelectedIndex());
+    	   
+    	//comboBox.setWidth(200);
+    	comboBox.addMouseEvent(new ServerMouseEvent(ServerEvent.MOUSE_CLICKED_EVENT));
+    	//comboBox.addFocusEvent(new ServerFocusEvent(ServerEvent.FOCUS_GAINED_EVENT));
+    	//comboBox.addKeyEvent(new ServerKeyEvent(ServerEvent.KEY_TYPED_EVENT));
+		ServerActionEvent event = new ServerActionEvent(getId());
+		
+		event.addReturnProperty(comboBox.getSelectedIndex());
+		event.setReturnAllValues(true);
+		comboBox.addActionEvent(event);
+		System.out.println("comboBox.getSelectedIndex() " + comboBox.getSelectedIndex());
+		//tu sa nic nezmenilo
+    	comboBox.setHasToRetunValue(true);  	
+        
+        return comboBox;
+    }
+	
+	@Override
+    protected EnabledPack createButtonEnabledPack() {
+        EnabledPack pack = super.createButtonEnabledPack();
+        if (getRowCount() > 0) {
+            pack.put(FILTER_TYP_ACTION, true);
+            pack.put(INSERT_ACTION, true);
+        }else{
+            pack.put(FILTER_TYP_ACTION, false);
+            pack.put(INSERT_ACTION, false);
+        }           
+        return pack;  
+    } 
+	
+	@Override
+	protected XClientServerTable createTable(ServerPack serverPack) {
+    	XClientServerTable table = super.createTable(serverPack);
+    	
+    	ValueTableRowColorModel tableRowColor = new ValueTableRowColorModel();
+        tableRowColor.add(ViewObchodnyPartner.TYP, TypObchodnehoPartnera.ZAKAZNIK.getKey(), null, Color.gray.darker());
+        tableRowColor.add(ViewObchodnyPartner.TYP, TypObchodnehoPartnera.DODAVATEL.getKey(), null, Color.black.darker());
+        table.setTableCellColorModel(tableRowColor);
+        table.setFreezeColumnsAllowed(true);
+        table.setVisibilityOfColumnsAllowed(true);
+    	return table;
+	}
+	
+	@Override
+	public void actionEventExecuted(ClientActionEvent event, ServerPack pack) {  
+		try {
+        	if ((event.getProperties() == null) && (event.getSourceId().equals(typObchodnehoPartneraActions.DODAVATEL_ACTION))) {
+        		
+        		readByFilter(pack, MDFilterDodavatel.class);  
+        		
+        	}else if ((event.getProperties() == null) && (event.getSourceId().equals(typObchodnehoPartneraActions.ZAKAZNIK_ACTION))) {
+        		
+        		readByFilter(pack, MDFilterZakaznik.class);  
+        		
+        	
+        	}else if ((event.getProperties() != null) && (event.getSourceId().equals(typObchodnehoPartneraActions.DODAVATEL_ACTION))) {
+        		
+        		runNext(MDDodavatel.class, null, pack);  
+        		
+        	}else if ((event.getProperties() != null) && (event.getSourceId().equals(typObchodnehoPartneraActions.ZAKAZNIK_ACTION))) {
+        		
+        		runNext(MDZakaznik.class, null, pack);  
+        	
+        	}else if (event.getSourceId().equals(FARBA_ACTION)) {
+        		//TODO - vymysliet, ako dostanem vybrany Item sem a budem s nim moct pracovat
+        		//this
+        		System.out.println("event.getProperties() " + event.getProperties());
+        		//problem je v tom, ze event nema ziadne values
+        		System.out.println("event.getValuePack() " + event.getValuePack());
+        		
+        		//event.getValuePack().getFormId();
+        		System.out.println("event.getValuePack().getValue(\"comboBox\") " + event.getValuePack().getValue("comboBox"));
+        		//idenx je ten vyber, co spravim na obchodnom partnerovi, ale neviem spravit vyber z ComboBoxu stale
+        		int index = this.getSelectedIndexFromEvent(event, pack);
+        		System.out.println("event.getValuePack().getValue(index) " + event.getValuePack().getValue(index));
+        		System.out.println("event.getValuePack().getValue(index) " + event.getValuePack().getValue(index));
+        		System.out.println("this.getSelectedIndexFromEvent(event, pack) " + this.getSelectedIndexFromEvent(event, pack));
+        		Object chosenColor = this.getData();
+        		System.out.println("chosenColor.getClass() " + chosenColor.getClass());
+        		System.out.println(chosenColor.toString());
+        		
+        		//color = (Color) chosenColor;
+        		//System.out.println("color " + color);
+        	
+        	}       	
+        	else{
+        		super.actionEventExecuted(event, pack);        		
+        	}    
+        }catch(Exception e) {
+        	addExceptionToPack(e, pack);
+        }                           
+    }
+	
+	@Override
+    protected boolean receiveCallBack(BasicMediator mediator,  MediatorCallBackObject obj, ServerPack pack) {
+        if (obj instanceof MDObchodnyPartner.CallBack) {
+        	MDObchodnyPartner.CallBack callBack = (MDObchodnyPartner.CallBack) obj;
+        	if (callBack.isNew) {
+        		addInsertedPack(callBack.id, pack);          
+        		addButtonEnabledPack(pack);
+        	}else {
+        		addUpdatedPack(callBack.id, getSelectedIndex(), pack);          
+        	} 
+        }else {
+        	return super.receiveCallBack(mediator, obj, pack);
+        }  
+        return false;        
+    } 
+	
+	private class TypObchodnehoPartneraActions implements AccessControlObject {
+		
+		final String ZAKAZNIK_ACTION = createId(TypObchodnehoPartnera.ZAKAZNIK.getKey());
+		final String DODAVATEL_ACTION = createId(TypObchodnehoPartnera.DODAVATEL.getKey());
+			
+	   	public AccessAction[] getAccessActions() {
+	   		return new AccessAction[] {
+	   				new AccessAction(ZAKAZNIK_ACTION, TypObchodnehoPartnera.ZAKAZNIK.getText(), "filtruje zakaznikov"),
+	   				new AccessAction(DODAVATEL_ACTION, TypObchodnehoPartnera.DODAVATEL.getText(), "filtruje dodavatelov"),
+	   				
+	   				
+	   		};
+	   	}
+    }
+
+}
