@@ -1,0 +1,36 @@
+package eshop.mapping;
+
+import eshop.su.common.MDMainMenu;
+import netframework.eclipselink.Application;
+import netframework.mediator.BasicMediator;
+import netframework.mediator.SessionObject;
+
+public class EShopAplication implements Application {
+
+	//tu si davam mediator, ktory sa spusti pri starte aplikacie / typicky MDMainMenu
+	@Override
+	public Class<? extends BasicMediator> getStartingMediatorClass() {
+		return MDMainMenu.class;
+	}
+
+	//tu si davam mediator, ktory sa spusti pri starte Access Action Tree / typicky MDMainMenu
+	@Override
+	public Class<? extends BasicMediator> getMediatorClassForAccessActionTree() {
+		return MDMainMenu.class;
+	}
+
+	@Override
+	public String getCode() {
+		return "skolenie";
+	}
+
+	@Override
+	public String[] getTranslationResourcesClasses() {
+		return new String[] {zelpo.eclipselink.translate.Resources.class.getName()};
+	}
+
+	@Override
+	public void initializeSessionObject(SessionObject session) {
+	}
+}
+
