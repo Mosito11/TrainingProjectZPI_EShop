@@ -1,0 +1,24 @@
+package eshop.su.common.view;
+
+
+import eshop.bo.ciselniky.Adresa;
+import netframework.eclipselink.EclipseLinkView;
+
+public class ViewAdresa extends EclipseLinkView {
+
+	public static final String ID = Adresa.ID.getId();
+    public static final String ULICA = Adresa.ULICA.getId();
+    public static final String CISLO = Adresa.CISLO.getId();
+    public static final String MESTO = Adresa.MESTO.getId();
+    public static final String PSC = Adresa.PSC.getId();
+	
+	public ViewAdresa() {
+		super(Adresa.class);
+		put(ID, Adresa.ID);
+		put(ULICA, Adresa.ULICA);
+		put(CISLO, Adresa.CISLO);
+		put(MESTO, Adresa.MESTO);
+		put(PSC, Adresa.PSC);
+	}
+
+}
