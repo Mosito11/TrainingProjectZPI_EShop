@@ -1,0 +1,128 @@
+package combo.box.test;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.ItemSelectable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+
+import netball.server.component.XIcon;
+import netframework.mediator.MDUtilities;
+
+public class MyFrame extends JFrame {
+	
+	Container pane;
+    JCheckBox first_checkBox, second_checkBox;
+    JRadioButton blue_button, red_button;
+    JPanel topPanel, centerPanel, colorPanel;
+    ButtonGroup bg;
+
+    public MyFrame()
+    {
+    	setSize(500,500);
+        setTitle("ItemListenerDemo");
+        pane = this.getContentPane();
+        pane.setLayout(new BorderLayout());
+        topPanel = new JPanel();
+        topPanel.setLayout(new FlowLayout());
+        centerPanel = new JPanel();
+        centerPanel.setLayout(new FlowLayout());
+        setComponents();
+        setListeners();
+    }
+    
+    public void setComponents(){
+        first_checkBox = new JCheckBox("First Button");
+        second_checkBox = new JCheckBox("Second Button");
+        bg = new ButtonGroup();
+        blue_button = new JRadioButton("blue panel");
+        red_button = new JRadioButton("red panel");
+        colorPanel = new JPanel();
+        colorPanel.setBackground(Color.BLACK);
+
+        bg.add(red_button);
+        bg.add(blue_button);
+
+        topPanel.add(first_checkBox);
+        topPanel.add(second_checkBox);
+        centerPanel.add(blue_button);
+        centerPanel.add(red_button);
+
+        pane.add(topPanel, BorderLayout.PAGE_START);
+        pane.add(centerPanel, BorderLayout.CENTER);
+        pane.add(colorPanel, BorderLayout.PAGE_END);
+      }
+    
+    public void setListeners(){
+        first_checkBox.addItemListener(new MyItemClass());
+        second_checkBox.addItemListener(new MyItemClass());
+
+        blue_button.addItemListener(new ItemListener() {
+             @Override
+             public void itemStateChanged(ItemEvent e) {
+                colorPanel.setBackground(Color.BLUE);
+             }
+          }
+       );
+
+
+       red_button.addItemListener(new ItemListener() {
+             @Override
+             public void itemStateChanged(ItemEvent e) {
+                colorPanel.setBackground(Color.RED);
+             }
+          }
+       );
+      }
+    
+    public static Frame createWindow(){
+        MyFrame mf = new MyFrame();
+        mf.setLocationRelativeTo(null);
+        mf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mf.setResizable(false);
+        mf.setVisible(true);
+        return mf;
+    }
+    
+    public class MyItemClass implements ItemListener{
+    	   @Override
+    	   public void itemStateChanged(ItemEvent e) {
+    	       ItemSelectable selection = e.getItemSelectable();
+    	        if(selection == first_checkBox){
+    	            if(first_checkBox.isSelected()){
+    	              first_checkBox.setText("active");
+    	            }
+    	            else{
+    	              first_checkBox.setText("inactive");
+    	            }
+    	        }
+    	        else if(selection == second_checkBox){
+    	           if(second_checkBox.isSelected()){
+    	              second_checkBox.setText("active");
+    	            }
+    	            else{
+    	              second_checkBox.setText("inactive");
+    	            }
+    	        }
+    	    }
+    	  }
+    
+    
+}
