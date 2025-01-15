@@ -1,0 +1,74 @@
+package eshop.su.common.report.prmt;
+
+import eshop.bo.ciselniky.ObchodnyPartner;
+import eshop.bo.ciselniky.Objednavka;
+import eshop.su.common.report.ReportObjednavka;
+import eshop.su.common.view.ViewObjednavka;
+import eshop.su.komponenty.ComponentZakaznik;
+import netball.client.ui.jtc.DynamicFilterEditorBuilder;
+import netball.server.component.XBorderPanel;
+import netball.server.component.XComponent;
+import netball.server.component.XDualComponentPanel;
+import netball.server.component.XDynamicFilter;
+import netball.server.component.XPanel;
+import netframework.mediator.BasicMediator;
+import netframework.mediator.MDUserReportPrmts;
+import netframework.report.UserReport;
+
+public class PRObjednavka extends MDUserReportPrmts {
+	
+	//private static final String DYNAMIC_FILTER = "DynamicFilter";
+
+	@Override
+	protected XPanel createFilterPanel() {
+		XDualComponentPanel panel = new XDualComponentPanel();
+		//panel.add(createComponent(ViewObjednavka.CISLO_OBJEDNAVKY, Objednavka.CISLO_OBJEDNAVKY));
+		panel.add(ComponentZakaznik.createComponent(ViewObjednavka.ZAKAZNIK_KOD, this));
+	
+		//TODO vyskusat si DynamicFilter
+		/*
+		XDynamicFilter filter = new XDynamicFilter(DYNAMIC_FILTER);
+		filter.addField(ViewFaktura.DATUM_VYSTAVENIA, translateText(Faktura.DATUM_VYSTAVENIA.getCaption()));
+		filter.addField(ViewFaktura.OBDOBIE, translateText(Faktura.OBDOBIE.getCaption()));
+		filter.addField(ViewFaktura.STAV, translateText(Faktura.STAV.getCaption()));
+		filter.addField(ViewFaktura.MENA_KOD, translateText(Mena.KOD.getLongCaption()));
+		filter.addField(ViewFaktura.CELKOVA_SUMA, translateText(Faktura.CELKOVA_SUMA.getCaption()));
+		
+		filter.setHeight(500);
+		filter.setWidth(600);
+		filter.setEditorBuilder(new EditorBuilder(), this);
+		*/
+		XBorderPanel mainPanel = new XBorderPanel(10, 10);
+		mainPanel.setNorth(panel);
+		//mainPanel.setCenter(filter);
+		
+        return mainPanel;
+	}
+
+	@Override
+	protected UserReport createUserReport() {
+		return new ReportObjednavka();
+	}
+	/*
+	private class EditorBuilder extends DynamicFilterEditorBuilder {
+		
+		@Override
+		public XComponent createEditor(Object fieldId, String componentId) throws Exception {
+			BasicMediator thisMediator = PRObjednavka.this;
+			if (fieldId.equals(ViewObjednavka.DATUM)) {
+				return createExpressionComponent(componentId, Objednavka.DATUM);
+			}else if (fieldId.equals(ViewObjednavka.STAV_OBJEDNAVKY)) {
+				return createExpressionComponent(componentId, Objednavka.STAV_OBJEDNAVKY);
+			}else if (fieldId.equals(ViewObjednavka.SUMA)) {
+				return createExpressionComponent(componentId, Objednavka.SUMA);
+			}else if (fieldId.equals(ViewObjednavka.ZAKAZNIK_NAZOV)) {
+				return ComponentZakaznik.createExpressionComponent(componentId, thisMediator);
+			}else if (fieldId.equals(ViewObjednavka.ZAKAZNIK_NAZOV)) {
+				return createExpressionComponent(componentId, ObchodnyPartner.NAZOV);
+			}
+			return null;
+		}
+	
+  	}
+	 */
+}
