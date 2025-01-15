@@ -1,0 +1,60 @@
+package eshop.test;
+
+import java.awt.Color;
+
+import eshop.bo.ciselniky.Objednavka;
+import eshop.mapping.EShopAplication;
+import eshop.mapping.EShopProjekt;
+import eshop.mapping.VyvojLogin;
+import eshop.su.ciselnik.md.MDAdresa;
+import eshop.su.ciselnik.md.MDDodavatel;
+import eshop.su.ciselnik.md.MDFaktura;
+import eshop.su.ciselnik.md.MDKontakt;
+import eshop.su.ciselnik.md.MDObchodnyPartner;
+import eshop.su.ciselnik.md.MDObjednavka;
+import eshop.su.ciselnik.md.MDObjednavkaPolozka;
+import eshop.su.ciselnik.md.MDTovar;
+import eshop.su.ciselnik.md.MDTovarDruh;
+import eshop.su.ciselnik.md.MDViewAdresa;
+import eshop.su.ciselnik.md.MDViewDodavatelZakaznik;
+import eshop.su.ciselnik.md.MDViewObjednavka;
+import eshop.su.ciselnik.md.MDViewTovar;
+import eshop.su.ciselnik.md.MDViewTovarDruh;
+import eshop.su.ciselnik.md.MDZakaznik;
+import eshop.su.ciselnik.uc.UCObjednavka;
+import eshop.su.common.MDMainMenuCTB;
+import eshop.su.common.MDMainMenu;
+import eshop.su.common.view.ViewObjednavka;
+import zelpo.eclipselink.common.ZPMediatorRunner;
+
+public class Start { 
+	
+	public static void main(String...strings) {
+		ZPMediatorRunner.Parameters prmts = new ZPMediatorRunner.Parameters();
+	    prmts.application = new EShopAplication();
+	    prmts.companyCode = "ZP";
+	    prmts.userName = "tester";
+	    //prmts.lookAndFeel = ZPMediatorRunner.METAL_LOOK_AND_FEEL;
+	    prmts.lookAndFeel = ZPMediatorRunner.FLAT_LOOK_AND_FEEL;
+	    EShopProjekt projekt = new EShopProjekt(new VyvojLogin().getLogin(null));
+		//ZPMediatorRunner.run(MDTovarDruh.class, null, projekt, prmts);
+		//ZPMediatorRunner.run(MDAdresa.class, new MDAdresa.Parameters(22), projekt, prmts);
+		//ZPMediatorRunner.run(MDViewTovarDruh.class, null, projekt, prmts);
+	    //ZPMediatorRunner.run(MDViewAdresa.class, null, projekt, prmts);
+	    //ZPMediatorRunner.run(MDZakaznik.class, new MDObchodnyPartner.Parameters(121), projekt, prmts);
+	    //ZPMediatorRunner.run(MDDodavatel.class, new MDObchodnyPartner.Parameters(201), projekt, prmts);
+	    //ZPMediatorRunner.run(MDViewDodavatelZakaznik.class, null, projekt, prmts);
+	    //ZPMediatorRunner.run(MDObjednavka.class, null, projekt, prmts);
+	    //ZPMediatorRunner.run(MDTovar.class, null, projekt, prmts);
+	    //ZPMediatorRunner.run(MDViewTovar.class, null, projekt, prmts);
+	    //ZPMediatorRunner.run(MDViewObjednavka.class, null, projekt, prmts);
+	    
+	    //new MDObjednavka.Parameters(361)
+	    //new MDTovar.Parameters(51)
+	    	    
+	    ZPMediatorRunner.run(MDMainMenu.class, null, projekt, prmts);
+	    //ZPMediatorRunner.run(MDMainMenuCTB.class, null, projekt, prmts);
+	    //ZPMediatorRunner.run(MDFaktura.class, null, projekt, prmts);
+	    
+	}
+}
