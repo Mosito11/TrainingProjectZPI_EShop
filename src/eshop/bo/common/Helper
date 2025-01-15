@@ -1,0 +1,27 @@
+package eshop.bo.common;
+
+import java.math.BigDecimal;
+
+import org.eclipse.persistence.zpi.expressions.Expression;
+import org.eclipse.persistence.zpi.expressions.ExpressionBuilder;
+import org.eclipse.persistence.zpi.sessions.Session;
+
+import netframework.mediator.SessionObject;
+
+public class Helper {
+	
+	public static final BigDecimal DEFAULT_VALUE = new BigDecimal("0");
+	public static final long DEFAULT_SPLATNOST = 14L;
+	
+	public static Object readObject(Object value, String nazovCiselnika, Class relacnaTrieda, String atribut, Session session, SessionObject sessionObject) throws Exception{
+        if(value == null)
+            return null;
+        ExpressionBuilder expBuilder = new ExpressionBuilder();   
+        Expression exp = (expBuilder.get(atribut).equal(value));
+        Object object = session.readObject(relacnaTrieda, exp);
+        if(object == null)
+        	throw new IllegalArgumentException("v evidencii sa " + nazovCiselnika + " nenachadza zaznam s hodnotou " + atribut);
+        return object;
+    }
+
+}
